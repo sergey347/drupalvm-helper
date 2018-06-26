@@ -1,0 +1,23 @@
+diff --git a/provisioning/roles/geerlingguy.drush/tasks/install-source.yml b/provisioning/roles/geerlingguy.drush/tasks/install-source.yml
+index 0349fc9..f831a09 100644
+--- a/provisioning/roles/geerlingguy.drush/tasks/install-source.yml
++++ b/provisioning/roles/geerlingguy.drush/tasks/install-source.yml
+@@ -9,6 +9,18 @@
+     depth: "{{ drush_clone_depth }}"
+   register: drush_clone
+ 
++- name: Get new tags from remote.
++  shell: "git fetch --tags"
++  args:
++    chdir: "{{ drush_source_install_path }}"
++  when: (drush_clone.changed and drush_specific_version)
++
++- name: Checkout to specific tag.
++  shell: "git checkout {{ drush_version_tag }}"
++  args:
++    chdir: "{{ drush_source_install_path }}"
++  when: (drush_clone.changed and drush_specific_version)
++
+ - name: Check for composer.json
+   stat: path={{ drush_source_install_path }}/composer.json
+   register: drush_composer
